@@ -1,0 +1,371 @@
+<launch>
+
+  <node pkg="Robotics_Lab_UAV" type="robotics_lab_dji_sdk_node" name="robotics_lab_dji_sdk" output="screen">
+  <!-- node parameters -->
+  <param name="serial_name" type="string" value="/dev/ttyUSB0"/>
+  <param name="baud_rate" type="int" value="921600"/>
+  <param name="app_id" type="int" value="1063680"/>
+  <param name="app_version" type="int" value="1"/>
+  <param name="align_time" type="bool" value="false"/>
+  <param name="enc_key" type="string" value="2bb0bf0b9f989dd552c7fbd001cbe6b3ae3f60be9094309eeb43c49708c37237"/>
+  <param name="use_broadcast" type="bool" value="false"/>
+  </node>
+
+  <arg name="lidar_address" default="os1-991907000494" doc="hostname or IP address in dotted decimal form of the Ouster sensor"/>
+  <arg name="pc_address" default="192.168.1.1" doc="hostname or IP address of the computer (PC) where the sensor will send data packets"/>
+  <arg name="lidar_port" default="7501" doc="port to which the sensor should send lidar data"/>
+  <arg name="imu_port" default="7503" doc="port to which the sensor should send imu data"/>
+  <arg name="replay" default="false" doc="when true, the node will listen on ~/lidar_packets and ~/imu_packets for data instead of attempting to connect to a sensor"/>
+  <arg name="scan_dur_ns" default="100000000" doc="nanoseconds to batch lidar packets before publishing a cloud"/>
+  <arg name="pointcloud_mode" default="XYZIFN" doc="Point cloud mode, supported modes: NATIVE, XYZ, XYZI, XYZIR, XYZIF, XYZIFN (I=intensity, R=ring, F=reflectivity, N=ambient noise). NATIVE is XYZIRFt where t=point timestamp."/>
+  <arg name="lidar_frame_name" default="velodyne" doc="Frame name for lidar output message"/>
+  <arg name="lidar_topic_name" default="/os1_node/points" doc="Topic name for lidar output message"/>
+  <arg name="imu_frame_name" default="imu" doc="Frame name for IMU output message"/>
+  <arg name="imu_topic_name" default="/imu_raw" doc="Topic name for IMU output message"/>
+  <arg name="operation_mode" default="1024x10" doc="Supported operation modes: 512x10, 1024x10, 2048x10, 512x20, 1024x20 (horizontal resolution x scan rate)"/>
+  <arg name="pulse_mode" default="0" doc="Laser pulse width"/>
+  <arg name="window_rejection" default="true" doc="Window rejection enable"/>
+
+  <node pkg="ouster_ros" type="ouster_ros" name="ouster_ros" output="screen" >
+    <param name="os1_lidar_address" value="$(arg lidar_address)"/>
+    <param name="pc_address" value="$(arg pc_address)"/>
+    <param name="os1_lidar_port" value="$(arg lidar_port)"/>
+    <param name="os1_imu_port" value="$(arg imu_port)"/>
+    <param name="replay" value="$(arg replay)"/>
+    <param name="scan_dur_ns" value="$(arg scan_dur_ns)"/>
+    <param name="points_topic_name" value="$(arg lidar_topic_name)"/>
+    <param name="imu_topic_name" value="$(arg imu_topic_name)"/>
+    <param name="lidar_frame_name" value="$(arg lidar_frame_name)"/>
+    <param name="imu_frame_name" value="$(arg imu_frame_name)"/>
+    <param name="pointcloud_mode" value="$(arg pointcloud_mode)"/>
+    <param name="operation_mode" value="$(arg operation_mode)"/>
+    <param name="pulse_mode" value="$(arg pulse_mode)"/>
+    <param name="window_rejection" value="$(arg window_rejection)"/>
+  </node>
+
+  <node
+    pkg="Robotics_Lab_UAV"
+    type="Autonomous_Navigation"
+    name="Autonomous_Navigation"
+    output="screen"
+  />
+
+  <node
+    pkg="rosservice"
+    type="rosservice"
+    name="set_local_ref_origin"
+    args="call --wait /dji_sdk/set_local_pos_ref"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="UAV_pose"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/UAV_pose.bag /UAV_pose"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="gimbal_angle"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/gimbal_angle.bag /dji_sdk/gimbal_angle"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="velocity"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/velocity.bag /dji_sdk/velocity"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="trigger_time"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/trigger_time.bag /dji_sdk/trigger_time"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="rc"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/rc.bag /dji_sdk/rc"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="from_mobile_data"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/from_mobile_data.bag /dji_sdk/from_mobile_data"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="local_frame_ref"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/local_frame_ref.bag /dji_sdk/local_frame_ref"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="imu"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/imu.bag /dji_sdk/imu"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="battery_state"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/battery_state.bag /dji_sdk/battery_state"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="gps_health"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/gps_health.bag /dji_sdk/gps_health"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="angular_velocity_fused"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/angular_velocity_fused.bag /dji_sdk/angular_velocity_fused"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="local_position"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/local_position.bag /dji_sdk/local_position"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="height_above_takeoff"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/height_above_takeoff.bag /dji_sdk/height_above_takeoff"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="flight_anomaly"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/flight_anomaly.bag /dji_sdk/flight_anomaly"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="vo_position"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/vo_position.bag /dji_sdk/vo_position"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="rc_connection_status"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/rc_connection_status.bag /dji_sdk/rc_connection_status"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="flight_status"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/flight_status.bag /dji_sdk/flight_status"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="acceleration_ground_fused"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/acceleration_ground_fused.bag /dji_sdk/acceleration_ground_fused"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="gps_position"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/gps_position.bag /dji_sdk/gps_position"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="display_mode"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/display_mode.bag /dji_sdk/display_mode"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="attitude"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/attitude.bag /dji_sdk/attitude"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="imu_raw"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/imu_raw.bag /imu_raw"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="flight_control_setpoint_ENUposition_yaw"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/flight_control_setpoint_ENUposition_yaw.bag /dji_sdk/flight_control_setpoint_ENUposition_yaw"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="flight_control_setpoint_ENUvelocity_yawrate"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/flight_control_setpoint_ENUvelocity_yawrate.bag /dji_sdk/flight_control_setpoint_ENUvelocity_yawrate"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="flight_control_setpoint_generic"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/flight_control_setpoint_generic.bag /dji_sdk/flight_control_setpoint_generic"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="flight_control_setpoint_rollpitch_yawrate_zposition"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/flight_control_setpoint_rollpitch_yawrate_zposition.bag /dji_sdk/flight_control_setpoint_rollpitch_yawrate_zposition"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="fpv_camera_images"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/fpv_camera_images.bag /dji_sdk/fpv_camera_images"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="gimbal_angle_cmd"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/gimbal_angle_cmd.bag /dji_sdk/gimbal_angle_cmd"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="gimbal_speed_cmd"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/gimbal_speed_cmd.bag /dji_sdk/gimbal_speed_cmd"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="main_camera_images"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/main_camera_images.bag /dji_sdk/main_camera_images"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="stereo_240p_down_back_images"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/stereo_240p_down_back_images.bag /dji_sdk/stereo_240p_down_back_images"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="stereo_240p_down_front_images"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/stereo_240p_down_front_images.bag /dji_sdk/stereo_240p_down_front_images"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="stereo_240p_front_left_images"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/stereo_240p_front_left_images.bag /dji_sdk/stereo_240p_front_left_images"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="stereo_240p_front_right_images"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/stereo_240p_front_right_images.bag /dji_sdk/stereo_240p_front_right_images"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="stereo_vga_front_left_images"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/stereo_vga_front_left_images.bag /dji_sdk/stereo_vga_front_left_images"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="stereo_240p_front_depth_images"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/stereo_vga_front_right_images.bag /dji_sdk/stereo_vga_front_right_images"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="OUSTER"
+    args="-O $(find Robotics_Lab_UAV)/data_without_camera/OUSTER.bag /os1_node/points"
+    output="screen"
+  />
+
+  <node
+    pkg="localization"
+    type="Localization_main"
+    name="SM"
+    output="screen"
+  />
+
+  <node
+    pkg="leaf_tracking"
+    type="tracker"
+    name="tracker"
+    output="screen"
+  />
+
+</launch>

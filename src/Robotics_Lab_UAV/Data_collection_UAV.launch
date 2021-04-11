@@ -1,0 +1,190 @@
+<launch>
+
+  <node pkg="Robotics_Lab_UAV" type="robotics_lab_dji_sdk_node" name="robotics_lab_dji_sdk" output="screen">
+  <!-- node parameters -->
+  <param name="serial_name" type="string" value="/dev/ttyUSB1"/>
+  <param name="baud_rate" type="int" value="230400"/>
+  <param name="app_id" type="int" value="1063680"/>
+  <param name="app_version" type="int" value="1"/>
+  <param name="align_time" type="bool" value="false"/>
+  <param name="enc_key" type="string" value="2bb0bf0b9f989dd552c7fbd001cbe6b3ae3f60be9094309eeb43c49708c37237"/>
+  <param name="use_broadcast" type="bool" value="false"/>
+  </node>
+
+	<include file="$(find velodyne_pointcloud)/launch/VLP16_points.launch">
+    	<arg name="device_ip" value="192.168.1.201"/>
+    	<arg name="port" value="2368"/>
+    	<arg name="frame_id" value="vlp1" />
+    	<arg name="ns" value="vlp1"/>
+      output="screen"
+	</include>
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="gimbal_angle"
+    args="-O $(find Robotics_Lab_UAV)/data/gimbal_angle.bag /dji_sdk/gimbal_angle"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="velocity"
+    args="-O $(find Robotics_Lab_UAV)/data/velocity.bag /dji_sdk/velocity"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="trigger_time"
+    args="-O $(find Robotics_Lab_UAV)/data/trigger_time.bag /dji_sdk/trigger_time"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="rc"
+    args="-O $(find Robotics_Lab_UAV)/data/rc.bag /dji_sdk/rc"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="from_mobile_data"
+    args="-O $(find Robotics_Lab_UAV)/data/from_mobile_data.bag /dji_sdk/from_mobile_data"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="local_frame_ref"
+    args="-O $(find Robotics_Lab_UAV)/data/local_frame_ref.bag /dji_sdk/local_frame_ref"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="imu"
+    args="-O $(find Robotics_Lab_UAV)/data/imu.bag /dji_sdk/imu"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="battery_state"
+    args="-O $(find Robotics_Lab_UAV)/data/battery_state.bag /dji_sdk/battery_state"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="gps_health"
+    args="-O $(find Robotics_Lab_UAV)/data/gps_health.bag /dji_sdk/gps_health"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="angular_velocity_fused"
+    args="-O $(find Robotics_Lab_UAV)/data/angular_velocity_fused.bag /dji_sdk/angular_velocity_fused"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="local_position"
+    args="-O $(find Robotics_Lab_UAV)/data/local_position.bag /dji_sdk/local_position"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="height_above_takeoff"
+    args="-O $(find Robotics_Lab_UAV)/data/height_above_takeoff.bag /dji_sdk/height_above_takeoff"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="flight_anomaly"
+    args="-O $(find Robotics_Lab_UAV)/data/flight_anomaly.bag /dji_sdk/flight_anomaly"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="vo_position"
+    args="-O $(find Robotics_Lab_UAV)/data/vo_position.bag /dji_sdk/vo_position"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="rc_connection_status"
+    args="-O $(find Robotics_Lab_UAV)/data/rc_connection_status.bag /dji_sdk/rc_connection_status"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="flight_status"
+    args="-O $(find Robotics_Lab_UAV)/data/flight_status.bag /dji_sdk/flight_status"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="acceleration_ground_fused"
+    args="-O $(find Robotics_Lab_UAV)/data/acceleration_ground_fused.bag /dji_sdk/acceleration_ground_fused"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="gps_position"
+    args="-O $(find Robotics_Lab_UAV)/data/gps_position.bag /dji_sdk/gps_position"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="display_mode"
+    args="-O $(find Robotics_Lab_UAV)/data/display_mode.bag /dji_sdk/display_mode"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="attitude"
+    args="-O $(find Robotics_Lab_UAV)/data/attitude.bag /dji_sdk/attitude"
+    output="screen"
+  />
+
+  <node
+    pkg="rosbag"
+    type="record"
+    name="VLP1"
+    args="-O $(find Robotics_Lab_UAV)/data/VLP1.bag /vlp1/velodyne_points"
+    output="screen"
+  />
+
+</launch>
