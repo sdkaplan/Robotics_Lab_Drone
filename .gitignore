@@ -1,6 +1,7 @@
 devel/
 build/
 **/*.bag
+src/ouster/
 
 # Realsense Ros gitignore
 src/realsense-ros/*.bin
