@@ -1,0 +1,9 @@
+<launch>
+
+  <node
+    pkg="localization"
+    type="Localization_main"
+    name="main"
+  />  
+
+</launch>
